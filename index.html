@@ -8,68 +8,180 @@
   </head>
   <body>
     <script>
-      // 스택과 큐를 js 클래스 구조로 구현하기
+      // 연결리스트
+      /*
+        연결리스트는 2개의 필드로 구성되어 있음
+        1. 데이터 필드
+        2. 다음 노드를 가리키는 링크를 갖고 있는 필드
 
-      // Stack 은 나중에 들어온 게 먼저 나가는 Last In First Out 형태의 자료구조
-      // 이거를 클래스로 구현해볼거임
-      // 이 클래스로 만든 자료 구조는 두 가지 메서드인 push, pop 이외에는
-      // 다른 작업을 할 수가 없음. 그러니 자연스럽게 Last In First Out 으로 제한되는 것!
-      class Stack {
-        constructor() {
-          this.arr = [];
-        }
+        visualgo.net 웹사이트에서
+        여러 종류의 연결리스트 알고리즘을
+        시각화된 형태로 볼 수 있음
 
-        push(data) {
-          this.arr.push(data);
-        }
+        일반적으로 연결리스트는 메모리 효율을 위해서
+        사용하는 경우가 많은데,
+        js 는 메모리 때문에 사용하는 건 아니고,
+        create, search, insert, remove 이런거 만들려고 쓴다고 함.
 
-        pop(index) {
-          // 여기서는 예외적으로
-          // 마지막 인덱스인 경우, 또는 사용자가 원하는 인덱스인 경우로 나눠서
-          // 마지막 인덱스면 원래 스택의 개념처럼 마지막 요소를 pop으로 꺼내기만 하면 됨.
-          // 그런데 인덱스가 마지막이 아니라면 해당 인덱스 자리의 요소를 splice 로 꺼내주도록 한 것. -> 이게 스택이 맞나? 흠..
-          if (index === this.arr.length - 1) {
-            return this.arr.pop();
-          }
+        어쨋든 이걸 js object(객체) 로 구현해보기로 하자.
+        그러려면 일단 2개의 필드 (데이터, 다음 노드를 가리키는 링크)가
+        포함되어 있어야겠지
+      */
+      /*
+        head 는 맨 처음 노드
+        value 는 각 노드의 데이터
+        next 는 다음 노드를 가리키는 링크
+        next: null 인 노드는 마지막 노드
 
-          let result = this.arr.splice(index, 1);
-          return result;
-        }
+        로 정리할 수 있겠지?
+      */
+      const list = {
+        head: {
+          value: 90,
+          next: {
+            value: 10,
+            next: {
+              value: 89,
+              next: {
+                value: 100,
+                next: null,
+              },
+            },
+          },
+        },
+      };
 
-        // 스택이 비어있는지 확인하는 메서드
-        empty() {
-          // 스택이 비었으면 배열 안에 아무것도 없을테니 length가 0이겠지
-          if (this.arr.length === 0) {
-            return true;
-          } else {
-            return false;
-          }
-        }
+      console.log(list);
+      console.log(list.head);
+      console.log(list.head.value); // 90이 출력되겠지
+      console.log(list.head.next.value); // 10이 출력되겠지
+      console.log(list.head.next.next.value); // 89가 출력되겠지
 
-        // 스택의 맨 윗부분(가장 최근에 push된거)를 알려주는 메서드
-        top() {
-          return this.arr[this.arr.length - 1];
-        }
+      // 이제 여기다가 여러 메서드를 추가해줘서
+      // 연결리스트 중간에 값을 삽입, 삭제 이런 작업들을 하고싶은 거임
 
-        // 스택의 맨 아랫부분(가장 먼저 push된거)를 알려주는 메서드
-        bottom() {
-          return this.arr[0];
+      // 이제 위에 list 처럼 만든 노드들을 다 하나하나씩 분리해서
+      // class 로 만들어볼거임
+      class Node {
+        constructor(data) {
+          this.data = data;
+          this.next = null;
         }
       }
 
-      let s = new Stack(); // 스택 인스턴스 생성
-      s.push(10);
-      s.push(20);
-      s.push(30);
-      s.push(100);
-      s.push(200);
-      s.push(300);
-      let popValue = s.pop(2); // 중간 데이터인 2번째 인덱스, 즉 30을 꺼내려는 것
+      class LinkedList {
+        constructor() {
+          // 새로운 노드를 하나 만들어 줌.
+          // 이렇게 하면 어떤 데이터가 아닌 'init' 즉, 첫번째 노드임을 가리키는 문자열이 들어가게 될 것임. head 로 바꿔도 괜찮음.
+          let init = new Node("init");
+          this.head = init; // 즉, 가장 처음에 오는 노드는 init 노드다 라고 할당해준 것.
+          this.tail = init; // 즉, 가장 마지막에 오는 노드도 init 노드다 라고 일단 초기화한 것.
 
-      console.log(s.arr);
-      console.log(popValue); // 중간에 pop 한 값을 보여줌
-      console.log(s.top()); // 스택의 맨 윗부분을 보여줌 (가장 최근에 push 된거)
-      console.log(s.bottom()); // 스택의 맨 아랫부분을 보여줌 (가장 먼저 push 된거)
+          // 현재노드는 연결리스트를 순회할 때 지금 노드가 어디인지를 가리키기 위해서 만들어놓은 속성값
+          this.현재노드 = undefined;
+          this.데이터수 = 0;
+        }
+
+        // toString() 에서 리턴받은 문자열을 진짜로 배열로 써보고 싶다면?
+        get fullData() {
+          let 순회용현재노드 = this.head;
+          순회용현재노드 = 순회용현재노드.next;
+
+          let s = "";
+          for (let i = 0; i < this.데이터수; i++) {
+            s += `${순회용현재노드.data}, `;
+            순회용현재노드 = 순회용현재노드.next; // 다음 반복문으로 넘어가기 전 다음노드 링크로 순회용현재노드를 업데이트해줌
+          }
+
+          // 이거를 JSON.parse() 로 감싸주면, 문자열을 분석해서 객체 또는 배열로 리턴해 줌.
+          return JSON.parse(`[${s.slice(0, -2)}]`);
+        }
+
+        // 현재 데이터수를 출력해주는 메서드
+        length() {
+          return this.데이터수;
+        }
+
+        // 마지막노드(꼬리부분)에 새로운 노드를 추가하는 메서드
+        append(data) {
+          let 새로운노드 = new Node(data);
+          this.tail.next = 새로운노드;
+          /*
+            이렇게 마지막 꼬리부분 노드에 추가해줌으로써
+            next가 null 이었던 것을 새롭게 만든 노드로 덮어써준 것.
+          */
+
+          // 이제 새롭게 만든 노드를 맨끝에 추가했으니, 이 새롭게 만든 노드가 제일 끝부분 노드가 되는거지
+          // 그니까 this.tail 을 새로운노드로 바꿔줘야 함.
+          this.tail = 새로운노드;
+          this.데이터수 += 1; // 노드를 새로 만들어서 하나 더 달아준 거니까 데이터 수도 1개 올려주도록 카운팅해야겠지
+        }
+
+        // 연결리스트의 노드들을 [1, 2, 3, 10, 20, 30] 이런식으로 보기 편하게 가공해주는 메서드
+        toString() {
+          // 일단 저 데이터들을 가져오려면 연결리스트 노드들을 모두 순환해야 되니까,
+          // 순환을 시작할 첫 번째 노드를 먼저 구해놓은 것
+          let 순회용현재노드 = this.head;
+          순회용현재노드 = 순회용현재노드.next; // 어차피 init값은 보여줄 필요 없으니까, 첫째노드에 연결된 다음노드부터 시작하는거지.
+
+          let s = "";
+          for (let i = 0; i < this.데이터수; i++) {
+            // 순회용현재노드의 data 값만 꺼내서 문자열로 누적해서 더해줄거임. 이때 데이터 숫자들을 구분하기 위해 , 를 찍어줌
+            s += `${순회용현재노드.data}, `;
+            순회용현재노드 = 순회용현재노드.next; // 다음 반복문으로 넘어가기 전 다음노드 링크로 순회용현재노드를 업데이트해줌
+          }
+
+          // 이거는 뭐냐면, ,(콤마) 를 써주기 때문에 1, 2, 3, 10, 20, 30, 이렇게 될 거 아냐.
+          // 근데 30 옆에 마지막 콤마와 마지막 띄어쓰기는 필요 없잖아. 그러니까 이거를 slice() 로 빼준 나머지 문자열을 다음 리턴한 것.
+          // 참고로 slice 도 String 에서 사용할 수 있음.
+          return `[${s.slice(0, -2)}]`; // 이런 식으로 배열 모양처럼 찍어줄 수도 있음.
+        }
+
+        // data 로 새로운 노드를 만들어서 연결리스트 사이에 특정 index 자리에 끼워넣어 주는 메서드
+        insert(index, data) {
+          // 일단 순회를 해야하니 toString() 메서드에서 사용했던 노드 순회 코드를 가져옴.
+          let 순회용현재노드 = this.head;
+          순회용현재노드 = 순회용현재노드.next;
+
+          // 이번에는 전달받은 특정 index 자리의 노드까지만 순회를 하도록 해서
+          // 순회용현재노드를 특정 index 자리의 노드로 업데이트 해줌.
+          for (let i = 0; i < index - 1; i++) {
+            순회용현재노드 = 순회용현재노드.next; // 다음 반복문으로 넘어가기 전 다음노드 링크로 순회용현재노드를 업데이트해줌
+          }
+
+          let 새로운노드 = new Node(data); // 끼어들어갈 새로운 노드를 만듦.
+
+          // 이거가 중요한데, visualgo.net 의 연결리스트 시연을 보면 쉽게 이해감.
+          // 먼저 새로운 노드 링크는 원래 null 이지만, 끼어들어야 하니까 특정 index 자리에 기존에 있었던 노드 링크와 같게 설정해줘야 함.
+          // 그리고 나서 그 기존의 노드 링크는 새로운 노드를 가리킬 수 있도록 하면, 새로운 노드가 중간에 끼어들 수 있게 된 것이지!
+          새로운노드.next = 순회용현재노드.next; // 참고로 이 순회용현재노드는 앞에 for 문에 의해 특정 index 자리의 노드로 업데이트된 상태임.
+          순회용현재노드.next = 새로운노드;
+
+          this.데이터수 += 1; // 노드를 하나 더 끼워넣었으니까 +1 카운팅
+        }
+      }
+
+      l = new LinkedList();
+      l.append(1);
+      l.append(2);
+      l.append(3);
+      l.append(10);
+      l.append(20);
+      l.append(30);
+      l.insert(2, 1000); // 2번째 인덱스 자리에 새로운 노드를 삽입하려는거지?
+      console.log(l.length());
+      console.log(l);
+
+      // 만약에 n번째 노드를 찍어보고 싶다면, 위에 object로 구현한 연결리스트랑 동일하게 해주면 됨.
+      console.log(l.head.data);
+      console.log(l.head.next.data);
+      console.log(l.head.next.next.data);
+      // 우리는 연결리스트로 이런 기능을 하고싶었던 거임. 여기에 중간에 노드를 삭제, 삽입 하는 기능들을 추가해주면 되겠지!
+
+      console.log(l.toString());
+      console.log(l.fullData);
+      // 클래스에서 get 은 메서드가 아니니까 호출하는 식으로 하면 안됨!
+      //  get을 실행한 뒤의 리턴값이 l.fullData 속성값 안에 들어가는 거라고 보면 됨.
     </script>
   </body>
 </html>
