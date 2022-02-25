@@ -8,48 +8,31 @@
   </head>
   <body>
     <script>
-      // 최솟값과 최댓값
-      let a = [10, 20, 30, 1, 2, 3, 5, 9, 11];
+      // 최솟값과 최댓값 reduce() 로 구하기
+      /*
+        앞서 설명한 Math.max, min 은
+        아주 큰값을 만나면 에러가 나기도 하고,
+        메모리 효율상 reduce() 로 구하는 것보다 좋지 못함. 
+      */
+      let a = [6, 5, 4, 3, 2];
 
-      // 여기서 최솟값을 구하려면 어째야할까?
-      a.sort(); // 이거는 숫자를 문자열로 변환해서 유니코드 순으로 정렬하는거임.
-      console.log(a[0]);
-      console.log(a[a.length - 1]);
-      console.log(a);
-      // 근데 이렇게 하면 찍히는 값들은 실제 최솟값 죄댓값이 아님
-      // 왜냐면 저 정렬은 말 그대로 유니코드 순이기 때문에 실제 숫자 크기 순이랑 상관이 없음.
-      // 드림코딩 앨리 js 개념강의 공부한거 찾아보면 sort 를 이용해서 오름차순, 내림차순 정렬하는 코드가 있기는 함.
+      // reduce 메서드를 쓰려면 누산을 해주는 reducer 함수가 인자로 필요함.
+      const reducerOne = (accumulator, currentvalue) =>
+        accumulator + currentvalue;
+      const reducerTwo = (accumulator, currentvalue) =>
+        accumulator - currentvalue; // 얘는 누적해서 빼주는 reducer
+      // 그런데 얘는, 모든 값을 다 -로 계산하는건 아니잖아?
+      // 첫번째 값은 + 로 나오고, 그 다음 값을 -로 빼는거기 때문에 -8이 나오겠지?
+      // 이 원리를 이용해서 최댓값 최솟값을 구할 수 있는 것!
+      const reducerThree = (accumulator, currentvalue) =>
+        accumulator > currentvalue ? accumulator : currentvalue; // 얘로 하면 최댓값
+      const reducerFour = (accumulator, currentvalue) =>
+        accumulator < currentvalue ? accumulator : currentvalue; // 얘로 하면 최솟값이 나옴
 
-      // 그래서 sort 대신 Math.max, min 을 사용해볼거임.
-      // console.log(Math.max(a)); 근데 이렇게 해주면 a는 숫자가 아니라서 최댓값이 나올 수 없음.
-      console.log(Math.max.apply(null, a)); // 대신 이 apply 라는 함수를 사용하면 null과 원하는 배열만 전달하면
-      // 배열안의 요소들도 마치 숫자처럼 값을 비교해서 최댓값 또는 최솟값을 리턴할 수 있음.
-      console.log(Math.min.apply(null, a));
-
-      // 이번에는 반복을 돌려서 구해보자
-      let max = 0;
-      for (const variable of a) {
-        // for...of 로 배열 a를 돌면서 현재 m값보다 더 큰 값을 마주치면 m을 그거로 바꿔주는 원리!
-        if (variable > max) {
-          max = variable;
-        }
-      }
-      console.log(max);
-
-      // 최솟값을 구하고 싶다면 조건문의 부호만 바꾸면 끝? ㄴㄴ
-      // min이 0인데 0보다 작은게 a에 있나? 없잖아
-      // 그니까 a에 있는 어떤 수보다도 클 수밖에 없는 999 이런 숫자를 임의로 넣어줘야 함.
-      // let min = 999;
-      let min = a[0]; // 재밌는 건, a에 있는 것중 아무거나 넣어줘도, '최솟값'을 구하는 데에는 문제가 없다는 거!
-      // 왜냐? 어차피 a 있는거 아무거나 넣어서 돌리면 거기서부터 시작해서 더 작은 값을 대입해줄거잖아!
-      // 반대로 최댓값 구할때에도 그냥 부호만 바꿔주고 a 중 아무거나로 시작해도 똑같은 원리로 구할 수 있음!
-      for (const variable of a) {
-        // for...of 로 배열 a를 돌면서 현재 m값보다 더 큰 값을 마주치면 m을 그거로 바꿔주는 원리!
-        if (variable < min) {
-          min = variable;
-        }
-      }
-      console.log(min);
+      console.log(a.reduce(reducerOne));
+      console.log(a.reduce(reducerTwo));
+      console.log(a.reduce(reducerThree));
+      console.log(a.reduce(reducerFour));
     </script>
   </body>
 </html>
