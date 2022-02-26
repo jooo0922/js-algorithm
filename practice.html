@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>연습문제</title>
+  </head>
+  <body>
+    <script>
+      // 1. 암호를 해독해라!
+      let data = [
+        "   + -- + - + -   ",
+        "   + --- + - +   ",
+        "   + -- + - + -   ",
+        "   + - + - + - +   ",
+      ];
+
+      let res = ""; // 아스키 문자열을 누산해주기 위한 빈 문자열
+
+      // 일단 각 암호들에 존재하는 공백들부터 다 없애줘야 함.
+      // 이거를 없애려면 replace 를 이용해 ' ' 공백문자를 '' 이렇게 띄어쓰기 없음으로 대체해줘야 함.
+      // 근데 한번 replace 할 때마다 각각 한칸의 공백들만 없어지기 때문에
+      // 정규표현식을 이용해서 replace 해줄거임
+      for (const s of data) {
+        // 이렇게 해주면 g 글로벌 속성에 의해서 각 문자열에 존재하는 / / 모든 한 칸 짜리 공백들을
+        // '' 띄어쓰기 없음으로 대체하도록 하는 것이지. 이렇게 하면 replace 를 반복해서 사용할 필요가 없음.
+        console.log(s.replace(/ /g, "").replace(/\+/g, "1").replace(/-/g, "0"));
+        // 그리고 모든 + 는 1로, - 는 0으로 replace 할건데,
+        // - 는 상관없지만 + 는 정규표현식의 문법으로 인식할 수 있기 때문에
+        // '정규표현식 + 가 아니라 문자열 + 을 대체해주세요' 라고 명령하기 위해 역슬래쉬(\) 를 붙여준 것.
+
+        // 그리고 Encoding 문제이기 때문에
+        // 이진수를 십진수로 변환하고,
+        // 그 십진수의 아스키코드 문자를 조합해서 정답을 구하는 컨셉임.
+        console.log(
+          parseInt(
+            s.replace(/ /g, "").replace(/\+/g, "1").replace(/-/g, "0"),
+            2
+          )
+        ); // parseInt 를 이용하면 0과 1로된 이진수 문자열을 십진수로 간단하게 바꿔줄 수 있음/
+
+        // 그 다음 십진수를 아스키코드 문자로 바꿔보기
+        console.log(
+          String.fromCharCode(
+            parseInt(
+              s.replace(/ /g, "").replace(/\+/g, "1").replace(/-/g, "0"),
+              2
+            )
+          )
+        ); // 또 String.fromCharCode 를 이용하면 십진수 아스키코드가 해당하는 아스키 문자열로 리턴해줌.
+
+        // 근데 출력조건이 이어진 문자열이니까 빈 문자열 s 에 누적덧셈 해주면 됨.
+        res += String.fromCharCode(
+          parseInt(
+            s.replace(/ /g, "").replace(/\+/g, "1").replace(/-/g, "0"),
+            2
+          )
+        );
+      }
+
+      console.log(res); // 정답은 JEJU
+    </script>
+  </body>
+</html>
