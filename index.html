@@ -161,11 +161,11 @@
             // 큐에서 빼온 것을 current에 추가하는 순간, current 에 자식노드가 있는지 검색해서 있으면 그거를 큐에 또 추가해 줌.
             // DFS 에서는 오른쪽 자식노드 먼저 스택에 push 해줬지만, BFS 에서는 왼쪽 자식노드 먼저 큐에 push 해준다는 것!
             if (current.left) {
-              // 왼쪽에 자식노드가 있으면 오른쪽 노드 먼저 큐에 push 함
+              // 왼쪽에 자식노드가 있으면 왼쪽 노드 먼저 큐에 push 함
               큐.push(current.left);
             }
             if (current.right) {
-              // 오른쪽에 자식노드가 있다면 왼쪽 노드는 나중에 큐에 push함
+              // 오른쪽에 자식노드가 있다면 오른쪽 노드는 나중에 큐에 push함
               큐.push(current.right);
             }
 
